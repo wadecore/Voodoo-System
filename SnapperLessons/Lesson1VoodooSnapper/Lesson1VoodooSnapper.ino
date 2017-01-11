@@ -11,7 +11,8 @@
  * Analog 1  - RobotGeek Rotation Knob (Shoulder)
  * Analog 2  - RobotGeek Rotation Knob (Elbow)
  * Analog 3  - RobotGeek Rotation Knob (Wrist)
- * Digital 2 - RobotGeek Pushbutton    (Gripper)
+ * Analog 4  - RobotGeek Rotation Knob (Gripper OPTION)
+ * Digital 2 - RobotGeek Pushbutton    (Gripper OPTION)
  * 
  * RobotGeek Snapper Connections:
  * Digital 3  - RobotGeek 180 Servo (Base)
@@ -29,7 +30,13 @@ const int ANALOG_0_PIN = 0;  // Analog Pin 0 is the first Rotation Knob in the s
 const int ANALOG_1_PIN = 1;  // Analog Pin 1 is the second Rotation Knob in the system. This will be set to control the Shoulder Servo on the Snapper.
 const int ANALOG_2_PIN = 2;  // Analog Pin 2 is the third Rotation Knob in the system. This will be set to control the Elbow Servo on the Snapper.
 const int ANALOG_3_PIN = 3;  // Analog Pin 3 is the fourth Rotation Knob in the system. This will be set to control the Wrist Servo on the Snapper.
-const int DIGITAL_4_PIN = 2; // Digital Pin 2 is the only Pushbutton in the system. This will be set to control the Gripper on the Snapper.
+
+/***********
+ * OPTIONS *
+ ***********/
+//To use the scroll wheel instead of a button to control the gripper, you can uncomment line 38 and comment out line 39.
+//const int ANALOG_4_PIN = 4;  // Analog Pin 4 is the fifth Rotation Knob in the system. This will be set to control the Gripper on the Snapper.
+const int DIGITAL_4_PIN = 4; // Digital Pin 4 is the only Pushbutton in the system. This will be set to control the Gripper on the Snapper.
 
 const int SERVO_0_PIN = 3;   // Servo 0 on Pin 3 is the Base Rotation Servo on the Snapper.
 const int SERVO_1_PIN = 5;   // Servo 1 on Pin 5 is the Shoulder Servo on the Snapper.
@@ -45,6 +52,7 @@ int analog0SensorValue;    // This is the raw value read from the first Rotation
 int analog1SensorValue;    // This is the raw value read from the second Rotation Knob.
 int analog2SensorValue;    // This is the raw value read from the third Rotation Knob.
 int analog3SensorValue;    // This is the raw value read from the fourth Rotation Knob.
+int analog4SensorValue;    // This is the raw value read from the fifth Rotation Knob.
 int digital4SensorValue;   // This is the raw value read from the Pushbutton.
 
 int servo0Value;           // This holds the current PWM value (0-255).
@@ -84,6 +92,12 @@ void loop()
   analog1SensorValue = analogRead(ANALOG_1_PIN);     // This reads the rotation knob and stores it in 'analog1SensorValue' 
   analog2SensorValue = analogRead(ANALOG_2_PIN);     // This reads the rotation knob and stores it in 'analog2SensorValue' 
   analog3SensorValue = analogRead(ANALOG_3_PIN);     // This reads the rotation knob and stores it in 'analog3SensorValue' 
+
+/***********
+ * OPTIONS *
+ ***********/
+//To use the scroll wheel instead of a button to control the gripper, you can uncomment line 100 and comment out line 101.
+  //analog4SensorValue = analogRead(ANALOG_4_PIN);     // This reads the rotation knob and stores it in 'analog4SensorValue' 
   digital4SensorValue = digitalRead(DIGITAL_4_PIN);  // This reads the pushbutton and stores it in 'digital4SensorValue' 
   
   servo0Value = map(analog0SensorValue, 900, 120, SERVO_MIN_PULSE, SERVO_MAX_PULSE);  // The map functions converts a number from one range to another, so the analog input is mapped to the servo microsecond values.
@@ -101,12 +115,22 @@ void loop()
   servo3Value = map(analog3SensorValue, 120, 900, SERVO_MIN_PULSE, SERVO_MAX_PULSE);  // The map functions converts a number from one range to another, so the analog input is mapped to the servo microsecond values.
   degree3Value = map(servo3Value, SERVO_MIN_PULSE, SERVO_MAX_PULSE, 0, 180);          // The map functions converts a number from one range to another, so the analog input is mapped to the servo microsecond values.
   servo3.write(degree3Value);                                                         // This sends the servo to the value in 'servoValue', thus adjusting the servo based on the analog input.
-  
+
+/***********
+ * OPTIONS *
+ ***********/
+//To use the scroll wheel instead of a button to control the gripper, you can uncomment lines 123-125.
+//  servo4Value = map(analog4SensorValue, 120, 900, SERVO_MIN_PULSE, SERVO_MAX_PULSE);  // The map functions converts a number from one range to another, so the analog input is mapped to the servo microsecond values.
+//  degree4Value = map(servo4Value, SERVO_MIN_PULSE, SERVO_MAX_PULSE, 0, 180);          // The map functions converts a number from one range to another, so the analog input is mapped to the servo microsecond values.
+//  servo4.write(degree4Value);                                                         // This sends the servo to the value in 'servoValue', thus adjusting the servo based on the analog input.
+
+//Write values to be read in the serial monitor  
   Serial.println("Raw Analog Values:");
   Serial.println(analog0SensorValue);
   Serial.println(analog1SensorValue);
   Serial.println(analog2SensorValue);
   Serial.println(analog3SensorValue);
+//  Serial.println(analog4SensorValue);
   Serial.println("| Mapped Value for Servos:");
   Serial.println(servo0Value);
   Serial.println(servo1Value);

@@ -14,7 +14,8 @@
  * Analog 1  - RobotGeek Rotation Knob (Shoulder)
  * Analog 2  - RobotGeek Rotation Knob (Elbow)
  * Analog 3  - RobotGeek Rotation Knob (Wrist)
- * Digital 2 - RobotGeek Pushbutton    (Gripper)
+ * Analog 4  - RobotGeek Rotation Knob (Gripper OPTION)
+ * Digital 4 - RobotGeek Pushbutton    (Gripper OPTION)
  * 
  * RobotGeek Snapper Connections:
  * Digital 3  - RobotGeek 180 Servo (Base)
@@ -39,14 +40,26 @@ const int ANALOG_0_PIN = 0;  // Analog Pin 0 is the first Rotation Knob in the s
 const int ANALOG_1_PIN = 1;  // Analog Pin 1 is the second Rotation Knob in the system. This will be set to control the Shoulder Servo on the Snapper.
 const int ANALOG_2_PIN = 2;  // Analog Pin 2 is the third Rotation Knob in the system. This will be set to control the Elbow Servo on the Snapper.
 const int ANALOG_3_PIN = 3;  // Analog Pin 3 is the fourth Rotation Knob in the system. This will be set to control the Wrist Servo on the Snapper.
-const int DIGITAL_4_PIN = 2; // Digital Pin 2 is the only Pushbutton in the system. This will be set to control the Gripper on the Snapper.
+
+/***********
+ * OPTIONS *
+ ***********/
+//To use the scroll wheel instead of a button to control the gripper, you can uncomment line 47 and comment out line 48.
+//const int ANALOG_4_PIN = 4;  // Analog Pin 4 is the fifth Rotation Knob in the system. This will be set to control the Gripper on the Snapper.
+const int DIGITAL_4_PIN = 4; // Digital Pin 4 is the only Pushbutton in the system. This will be set to control the Gripper on the Snapper.
 
 int current0Value, next0Value; // This makes two variables for handling the values we'll be storing to smooth out the movement.
 int current1Value, next1Value; // This makes two variables for handling the values we'll be storing to smooth out the movement.
 int current2Value, next2Value; // This makes two variables for handling the values we'll be storing to smooth out the movement.
 int current3Value, next3Value;    // This makes two variables for handling the values we'll be storing to smooth out the movement.
-int buttonPress; // This makes two variables for handling the values we'll be storing to smooth out the movement.
-boolean toggle = true;
+
+/***********
+ * OPTIONS *
+ ***********/
+//To use the scroll wheel instead of a button to control the gripper, you can uncomment line 59 and comment out lines 60 and 61.
+//int current4Value, next4Value;    // This makes two variables for handling the values we'll be storing to smooth out the movement.
+int buttonPress; // This stores the button press so that we can toggle between two states.
+boolean toggle = true; // This is a boolean value (True or False) which we will use to hold the gripper position in two separate states depending on the button press.
 
 void setup() 
 {
@@ -56,6 +69,12 @@ void setup()
   pinMode(ANALOG_1_PIN, INPUT);  // Setting Analog Pin 1 to Input
   pinMode(ANALOG_2_PIN, INPUT);  // Setting Analog Pin 2 to Input
   pinMode(ANALOG_3_PIN, INPUT);  // Setting Analog Pin 3 to Input
+  
+  /***********
+   * OPTIONS *
+   ***********/
+  //To use the scroll wheel instead of a button to control the gripper, you can uncomment line 76 and comment out line 77.
+  //pinMode(ANALOG_4_PIN, INPUT);  // Setting Analog Pin 4 to Input
   pinMode(DIGITAL_4_PIN, INPUT); // Setting Digital Pin 2 to Input
 
   servo0.attach(3);  // This attaches the servo to the appropriate pin using the servo library.
@@ -82,7 +101,13 @@ void loop()
   next3Value = analogRead(ANALOG_3_PIN);           //Set Next3Value to the value read from Analog 3
   next3Value = map(next3Value, 120, 900, 0, 180);  //Map the value we just read from Analog 3 to a set of values that can be used for a servo.
 
-  buttonPress = digitalRead(DIGITAL_4_PIN);        //Set buttonPress to the value read from Digital 2
+  /***********
+   * OPTIONS *
+   ***********/
+  //To use the scroll wheel instead of a button to control the gripper, you can uncomment lines 107 and 108 and comment out line 109.
+  //next4Value = analogRead(ANALOG_4_PIN);           //Set Next3Value to the value read from Analog 3
+  //next4Value = map(next3Value, 0, 1023, 0, 180);  //Map the value we just read from Analog 3 to a set of values that can be used for a servo.
+  buttonPress = digitalRead(DIGITAL_4_PIN);        //Set buttonPress to the value read from Digital 4
 
   //Send a readout of the angles of each servo over serial 
   Serial.print("Base Angle = ");
@@ -182,9 +207,31 @@ void loop()
   }
 
   /*
-   * Write Values to the Gripper
+   * OPTION Uncomment this section to use Scroll wheel instead of Button to control Gripper
    */
+//  if (next4Value > current4Value)                     // If the mapped value read at Analog 4 is higher than the value read by Servo 4  
+//  {
+//    for (int i = current4Value; i <= next4Value; i++) // This makes a for loop where i is the value read by Servo 4. While it is less than or equal to the mapped value of Analog 4, add 1 to current4Value.  
+//    {
+//      servo4.write(i);                                // Write current3Value to Servo 3
+//      delay(2);                                       // Delay for 2 milliseconds
+//    }                                                 // if the test condition hasn't been met, start this loop over, adding 1 to current4Value until it has the same value as next4Value.
+//  } 
+//  else if (next4Value < current4Value)                // If the mapped value read at Analog 4 is lower than the value read by Servo 4
+//  {
+//    for (int i = current4Value; i >= next4Value; i--) // This makes a for loop where i is the value read by Servo 4. While it is greater than or equal to the mapped value of Analog 4, subtract 1 from current4Value.  
+//    {
+//      servo4.write(i);                                // Write current4Value to Servo 4
+//      delay(2);                                       // Delay for 2 milliseconds
+//    }                                                 // if the test condition hasn't been met, start this loop over, adding 1 to current4Value until it has the same value as next4Value.
+//  }
 
+
+  /*
+   * OPTION Write Values to the Gripper
+   */
+//Comment this section out if you are using the scroll wheel.
+//Begin Comment
   if (buttonPress == HIGH) // If the pushbutton has been pressed
   {
     if(toggle)             // Do this if toggle is true
@@ -198,6 +245,7 @@ void loop()
       toggle = !toggle;    // Invert toggle, making it true
     }
   }
+//End Comment
 
   /*
    * Set Current Values of the Servos
@@ -206,5 +254,7 @@ void loop()
   current1Value = servo1.read(); // Save the position of Servo 1 to current1Value
   current2Value = servo2.read(); // Save the position of Servo 2 to current2Value
   current3Value = servo3.read(); // Save the position of Servo 3 to current3Value
+  //Uncomment the next line if you are using the scroll wheel
+  //current4Value = servo4.read(); // Save the position of Servo 4 to current4Value
   delay(2); //delay for 2 milliseconds
 }
